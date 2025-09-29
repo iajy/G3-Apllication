@@ -28,7 +28,7 @@ const Login = () => {
 
   return (
     <div className="flex flex-col mx-15">
-      <img src="public\images.png" alt="" width={100} />
+      <img src="images.png" alt="" width={100} />
       <div className="flex flex-col gap-4">
         <span className="text-4xl font-medium">Sign In to your Account</span>
         <span className="text-gray-700">

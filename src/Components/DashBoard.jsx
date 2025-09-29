@@ -15,7 +15,7 @@ const DashBoard = () => {
         <div className="flex flex-col items-center">
           {/* Logo / Image */}
           <img
-            src="public/images.png"
+            src="/images.png"
             alt="Logo"
             className="w-25 h-12 mb-4 rounded-full"
           />
