@@ -7,6 +7,8 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
+import { MdOutlineDelete } from "react-icons/md";
+import { FaRegEdit } from "react-icons/fa";
 
 const columns = [
   { id: "SL", label: "S.L", minWidth: 10 },
@@ -31,7 +33,7 @@ const columns = [
   },
   { id: "role", label: "Role", minWidth: 10 },
   { id: "status", label: "Status", minWidth: 10 },
-  { id: "title", label: "Title", minWidth: 10},
+  { id: "title", label: "Title", minWidth: 10 },
   { id: "action", label: "Action", minWidth: 10 },
 ];
 
@@ -51,18 +53,116 @@ function createData(
 }
 
 const rows = [
-    createData(1,"AjayBinu","ajaybinuajay2002@gmail.com","Binu",123456667,"User","Active","23-03-25",),
-    createData(2,"AjayBinu","ajaybinuajay2002@gmail.com","Binu",123456667,"User","Active","23-03-25",),
-    createData(3,"AjayBinu","ajaybinuajay2002@gmail.com","Binu",123456667,"User","Active","23-03-25",),
-    createData(4,"AjayBinu","ajaybinuajay2002@gmail.com","Binu",123456667,"User","Active","23-03-25",),
-    createData(5,"AjayBinu","ajaybinuajay2002@gmail.com","Binu",123456667,"User","Active","23-03-25",),
-    createData(6,"AjayBinu","ajaybinuajay2002@gmail.com","Binu",123456667,"User","Active","23-03-25",),
-    createData(7,"AjayBinu","ajaybinuajay2002@gmail.com","Binu",123456667,"User","Active","23-03-25",),
-    createData(8,"AjayBinu","ajaybinuajay2002@gmail.com","Binu",123456667,"User","Active","23-03-25",),
-    createData(9,"AjayBinu","ajaybinuajay2002@gmail.com","Binu",123456667,"User","Active","23-03-25",),
-    createData(10,"AjayBinu","ajaybinuajay2002@gmail.com","Binu",123456667,"User","Active","23-03-25",),
-    createData(11,"AjayBinu","ajaybinuajay2002@gmail.com","Binu",123456667,"User","Active","23-03-25",),
-
+  createData(
+    1,
+    "AjayBinu",
+    "ajaybinuajay2002@gmail.com",
+    "Binu",
+    123456667,
+    "User",
+    "Active",
+    "23-03-25"
+  ),
+  createData(
+    2,
+    "AjayBinu",
+    "ajaybinuajay2002@gmail.com",
+    "Binu",
+    123456667,
+    "User",
+    "Active",
+    "23-03-25"
+  ),
+  createData(
+    3,
+    "AjayBinu",
+    "ajaybinuajay2002@gmail.com",
+    "Binu",
+    123456667,
+    "User",
+    "Active",
+    "23-03-25"
+  ),
+  createData(
+    4,
+    "AjayBinu",
+    "ajaybinuajay2002@gmail.com",
+    "Binu",
+    123456667,
+    "User",
+    "Active",
+    "23-03-25"
+  ),
+  createData(
+    5,
+    "AjayBinu",
+    "ajaybinuajay2002@gmail.com",
+    "Binu",
+    123456667,
+    "User",
+    "Active",
+    "23-03-25"
+  ),
+  createData(
+    6,
+    "AjayBinu",
+    "ajaybinuajay2002@gmail.com",
+    "Binu",
+    123456667,
+    "User",
+    "Active",
+    "23-03-25"
+  ),
+  createData(
+    7,
+    "AjayBinu",
+    "ajaybinuajay2002@gmail.com",
+    "Binu",
+    123456667,
+    "User",
+    "Active",
+    "23-03-25"
+  ),
+  createData(
+    8,
+    "AjayBinu",
+    "ajaybinuajay2002@gmail.com",
+    "Binu",
+    123456667,
+    "User",
+    "Active",
+    "23-03-25"
+  ),
+  createData(
+    9,
+    "AjayBinu",
+    "ajaybinuajay2002@gmail.com",
+    "Binu",
+    123456667,
+    "User",
+    "Active",
+    "23-03-25"
+  ),
+  createData(
+    10,
+    "AjayBinu",
+    "ajaybinuajay2002@gmail.com",
+    "Binu",
+    123456667,
+    "User",
+    "Active",
+    "23-03-25"
+  ),
+  createData(
+    11,
+    "AjayBinu",
+    "ajaybinuajay2002@gmail.com",
+    "Binu",
+    123456667,
+    "User",
+    "Active",
+    "23-03-25"
+  ),
 ];
 
 export default function UserList() {
@@ -108,6 +208,24 @@ export default function UserList() {
                           {column.format && typeof value === "number"
                             ? column.format(value)
                             : value}
+                          {column.id == "action" && (
+                            <div className="flex gap-2">
+                              <div className="p-2 bg-red-100 rounded-full ">
+                                <MdOutlineDelete
+                                  className=" text-red-600 cursor-pointer "
+                                  size={19} 
+                                //   onClick={deleteUser}
+                                />
+                              </div>
+                              <div className="p-2 bg-blue-100 rounded-full  ">
+                                <FaRegEdit
+                                  className="text-blue-600 cursor-pointer "
+                                  size={19}
+                                //   onClick={editUser}
+                                />
+                              </div>
+                            </div>
+                          )}
                         </TableCell>
                       );
                     })}
