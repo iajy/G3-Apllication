@@ -9,6 +9,8 @@ import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import { MdOutlineDelete } from "react-icons/md";
 import { FaRegEdit } from "react-icons/fa";
+import EditUser from "./EditUser";
+import { useState } from "react";
 
 const columns = [
   { id: "SL", label: "S.L", minWidth: 10 },
@@ -48,7 +50,7 @@ function createData(
   title,
   action
 ) {
-  //   const density = population / size;
+  
   return { SL, name, email, initials, phone, role, status, title, action };
 }
 
@@ -120,7 +122,7 @@ const rows = [
     "Binu",
     123456667,
     "User",
-    "Active",
+    "Inactive",
     "23-03-25"
   ),
   createData(
@@ -140,7 +142,7 @@ const rows = [
     "Binu",
     123456667,
     "User",
-    "Active",
+    "Inactive",
     "23-03-25"
   ),
   createData(
@@ -160,7 +162,7 @@ const rows = [
     "Binu",
     123456667,
     "User",
-    "Active",
+    "Inactive",
     "23-03-25"
   ),
 ];
@@ -178,72 +180,86 @@ export default function UserList() {
     setPage(0);
   };
 
+  const [edit, setEdit] = useState(false);
+
+  const editUser = () => {
+    setEdit(!edit);
+  };
+
   return (
-    <Paper sx={{ width: "100%", overflow: "hidden" }}>
-      <TableContainer sx={{ maxHeight: 440 }}>
-        <Table stickyHeader aria-label="sticky table">
-          <TableHead>
-            <TableRow>
-              {columns.map((column) => (
-                <TableCell
-                  key={column.id}
-                  align={column.align}
-                  style={{ minWidth: column.minWidth }}
-                >
-                  {column.label}
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rows
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((row) => {
-                return (
-                  <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
-                    {columns.map((column) => {
-                      const value = row[column.id];
-                      return (
-                        <TableCell key={column.id} align={column.align}>
-                          {column.format && typeof value === "number"
-                            ? column.format(value)
-                            : value}
-                          {column.id == "action" && (
-                            <div className="flex gap-2">
-                              <div className="p-2 bg-red-100 rounded-full ">
-                                <MdOutlineDelete
-                                  className=" text-red-600 cursor-pointer "
-                                  size={19} 
-                                //   onClick={deleteUser}
-                                />
+    <>
+      <Paper sx={{ width: "100%", overflow: "hidden" }}>
+        <TableContainer sx={{ maxHeight: 440 }}>
+          <Table stickyHeader aria-label="sticky table">
+            <TableHead>
+              <TableRow>
+                {columns.map((column) => (
+                  <TableCell
+                    key={column.id}
+                    align={column.align}
+                    style={{ minWidth: column.minWidth }}
+                  >
+                    {column.label}
+                  </TableCell>
+                ))}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {rows
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((row) => {
+                  return (
+                    <TableRow
+                      hover
+                      role="checkbox"
+                      tabIndex={-1}
+                      key={row.code}
+                    >
+                      {columns.map((column) => {
+                        const value = row[column.id];
+                        return (
+                          <TableCell key={column.id} align={column.align}>
+                            {column.format && typeof value === "number"
+                              ? column.format(value)
+                              : value}
+                            {column.id == "action" && (
+                              <div className="flex gap-2">
+                                <div className="p-2 bg-red-100 rounded-full ">
+                                  <MdOutlineDelete
+                                    className=" text-red-600 cursor-pointer "
+                                    size={19}
+                                    //   onClick={deleteUser}
+                                  />
+                                </div>
+                                <div className="p-2 bg-blue-100 rounded-full  ">
+                                  <FaRegEdit
+                                    className="text-blue-600 cursor-pointer "
+                                    size={19}
+                                    onClick={editUser}
+                                  />
+                                </div>
                               </div>
-                              <div className="p-2 bg-blue-100 rounded-full  ">
-                                <FaRegEdit
-                                  className="text-blue-600 cursor-pointer "
-                                  size={19}
-                                //   onClick={editUser}
-                                />
-                              </div>
-                            </div>
-                          )}
-                        </TableCell>
-                      );
-                    })}
-                  </TableRow>
-                );
-              })}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <TablePagination
-        rowsPerPageOptions={[10, 25, 100]}
-        component="div"
-        count={rows.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-      />
-    </Paper>
+                            )}
+                          </TableCell>
+                        );
+                      })}
+                    </TableRow>
+                  );
+                })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        <TablePagination
+          rowsPerPageOptions={[10, 25, 100]}
+          component="div"
+          count={rows.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
+      </Paper>
+      {edit && <EditUser onExit={() => setEdit(false)} />}
+    </>
   );
 }

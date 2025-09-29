@@ -2,6 +2,7 @@ import React from "react";
 import Login from "./Components/Login";
 import DashBoard from "./Components/DashBoard";
 import { Route, Router, Routes } from "react-router-dom";
+import EditUser from "./Components/EditUser";
 
 const App = () => {
   return (
@@ -16,6 +17,7 @@ const App = () => {
           }
         />
         <Route path="/dashboard" element={<DashBoard />} />
+        <Route path="/editUser" element={<EditUser />} />
       </Routes>
     </>
   );
