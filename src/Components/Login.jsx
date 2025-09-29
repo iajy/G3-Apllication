@@ -3,7 +3,6 @@ import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { MdOutlineEmail } from "react-icons/md";
 import { RiLockPasswordLine } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
 
 const Login = () => {
   const [eye, setEye] = useState(false);
@@ -19,9 +18,7 @@ const Login = () => {
     
     if (mail ==="reactdev@gmail.com" && password === "12345678") {
       navigate("/dashboard");
-      toast.success("Login Successfull");
     }else{
-      toast.error("Wrong Credentials")
       console.log("error")
     }
     
