@@ -27,11 +27,10 @@ const Login = () => {
         password: password,
       });
 
-      // login success → you get user + companies + tokens
+
       const data = res.data;
       console.log("Login Response:", data);
 
-      // save tokens + company id (first company by default)
       localStorage.setItem("token", data.access_token);
       if (data.companies && data.companies.length > 0) {
         localStorage.setItem("company_id", data.companies[0].id);

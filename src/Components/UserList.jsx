@@ -15,7 +15,7 @@ import axios from "axios";
 
 const columns = [
   { id: "SL", label: "S.L", minWidth: 10 },
-  { id: "name", label: "Name", minWidth: 50 },
+  { id: "first_name", label: "Name", minWidth: 50 },
   { id: "email", label: "Email", minWidth: 10, align: "right" },
   { id: "initials", label: "Initials", minWidth: 10, align: "right" },
   { id: "phone", label: "Phone", minWidth: 100, align: "right" },
@@ -25,13 +25,13 @@ const columns = [
   { id: "action", label: "Action", minWidth: 10 },
 ];
 
-export default function UserList() {
+export default function UserList({ statusFilter, searchQuery }) {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [users, setUsers] = useState([]);
   const [edit, setEdit] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
 
-  // Fetch users from backend
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -40,12 +40,11 @@ export default function UserList() {
 
         const res = await axios.get("http://13.210.33.250/api/user?status=1", {
           headers: {
-            Authorization: `Bearer ${token}`, // token
-            company_id: companyId, // company id
+            Authorization: `Bearer ${token}`,
+            company_id: companyId,
           },
         });
 
-        console.log("Fetched users:", res.data);
         setUsers(res.data.data);
       } catch (error) {
         console.error("Error fetching users:", error);
@@ -54,17 +53,10 @@ export default function UserList() {
     fetchUsers();
   }, []);
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
+  const handleChangePage = (event, newPage) => setPage(newPage);
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(+event.target.value);
     setPage(0);
-  };
-
-  const editUser = () => {
-    setEdit(!edit);
   };
 
   const toggleStatus = async (userId, currentStatus) => {
@@ -72,16 +64,10 @@ export default function UserList() {
       const token = localStorage.getItem("token");
       const companyId = localStorage.getItem("company_id");
 
-      // Update status
-      const res = await axios.post(
+      await axios.post(
         `http://13.210.33.250/api/user/${userId}/status`,
         { status: currentStatus ? 0 : 1 },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            company_id: companyId,
-          },
-        }
+        { headers: { Authorization: `Bearer ${token}`, company_id: companyId } }
       );
 
       setUsers((prevUsers) =>
@@ -94,11 +80,30 @@ export default function UserList() {
     }
   };
 
+  const editUser = (user) => {
+    setSelectedUser(user);
+    setEdit(true);
+  };
+ 
+  const filteredUsers = users.filter((user) => {
+    const matchesStatus =
+    !statusFilter ||
+    (statusFilter === "active" && Number(user.status) === 1) ||
+    (statusFilter === "inactive" && Number(user.status) === 0);
+
+    const matchesSearch =
+      !searchQuery ||
+      user.first_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchQuery.toLowerCase());
+
+    return matchesStatus && matchesSearch;
+  });
+
   return (
     <>
       <Paper sx={{ width: "100%", overflow: "hidden" }}>
         <TableContainer sx={{ maxHeight: 440 }}>
-          <Table stickyHeader aria-label="sticky table">
+          <Table stickyHeader>
             <TableHead>
               <TableRow>
                 {columns.map((column) => (
@@ -113,16 +118,16 @@ export default function UserList() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {users
+              {filteredUsers
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((user, index) => (
-                  <TableRow hover role="checkbox" tabIndex={-1} key={user.id}>
+                  <TableRow hover key={user.id}>
                     <TableCell>{index + 1}</TableCell>
-                    <TableCell>{user.name}</TableCell>
+                    <TableCell>{user.first_name}</TableCell>
                     <TableCell align="right">{user.email}</TableCell>
-                    <TableCell align="right">{user.initials}</TableCell>
-                    <TableCell align="right">{user.phone}</TableCell>
-                    <TableCell>{user.role?.title}</TableCell>
+                    <TableCell align="right">{user.initials || "NIL"}</TableCell>
+                    <TableCell align="right">{user.phone || "NIL"}</TableCell>
+                    <TableCell>{user.role?.title || "NIL"}</TableCell>
                     <TableCell>
                       <button
                         onClick={() => toggleStatus(user.id, user.status)}
@@ -148,7 +153,7 @@ export default function UserList() {
                           <FaRegEdit
                             className="text-blue-600 cursor-pointer"
                             size={19}
-                            onClick={editUser}
+                            onClick={() => editUser(user)}
                           />
                         </div>
                       </div>
@@ -161,14 +166,26 @@ export default function UserList() {
         <TablePagination
           rowsPerPageOptions={[10, 25, 100]}
           component="div"
-          count={users.length}
+          count={filteredUsers.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Paper>
-      {edit && <EditUser onExit={() => setEdit(false)} />}
+
+      {edit && selectedUser && (
+        <EditUser
+          user={selectedUser}
+          onExit={() => setEdit(false)}
+          onUpdate={(updatedUser) => {
+            setUsers((prev) =>
+              prev.map((u) => (u.id === updatedUser.id ? updatedUser : u))
+            );
+            setEdit(false);
+          }}
+        />
+      )}
     </>
   );
 }
