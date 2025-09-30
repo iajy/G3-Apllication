@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import UserList from "./UserList";
+import EditUser from "./EditUser";
 import { IoMdSearch } from "react-icons/io";
 import { FaAngleDown, FaBell } from "react-icons/fa";
 import { SlOptionsVertical } from "react-icons/sl";
@@ -10,16 +11,21 @@ const DashBoard = () => {
   const [statusFilter, setStatusFilter] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
 
+ 
+  const [edit, setEdit] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null); 
+
+  const handleAddUser = () => {
+    setSelectedUser(null); 
+    setEdit(true);
+  };
+
   return (
     <div className="grid grid-cols-4 gap-6 p-6 min-h-screen bg-gray-100">
       {/* Sidebar */}
       <div className="col-span-1 bg-white rounded-lg shadow-md p-4">
         <div className="flex flex-col items-center">
-          <img
-            src="/images.png"
-            alt="Logo"
-            className="w-25 h-12 mb-4 rounded-full"
-          />
+          <img src="/images.png" alt="Logo" className="w-25 h-12 mb-4 rounded-full" />
           <span className="text-xl font-semibold mb-6">Dashboard</span>
         </div>
       </div>
@@ -56,35 +62,44 @@ const DashBoard = () => {
           <span className="text-2xl font-medium block mb-4">Users</span>
           <div className="flex gap-5 justify-between mb-4">
             <div className="flex gap-5">
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Search by name or email"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="border rounded border-gray-500 px-7 py-2 focus:outline-1 focus:outline-blue-600"
-                />
-              </div>
-              <div className="relative">
-                <select
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                  className="border rounded border-gray-500 px-7 py-2 focus:outline-1 focus:outline-blue-600"
-                >
-                  <option value="">All Status</option>
-                  <option value="active">Active</option>
-                  <option value="inactive">Inactive</option>
-                </select>
-              </div>
+              <input
+                type="text"
+                placeholder="Search by name or email"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="border rounded border-gray-500 px-7 py-2 focus:outline-1 focus:outline-blue-600"
+              />
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="border rounded border-gray-500 px-7 py-2 focus:outline-1 focus:outline-blue-600"
+              >
+                <option value="">All Status</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
             </div>
             <div className="flex items-center gap-3">
-              <button className="bg-[#145dd1] text-white p-2 rounded font-medium">
+              <button
+                className="bg-[#145dd1] text-white p-2 rounded font-medium"
+                onClick={handleAddUser}
+              >
                 + Add New User
               </button>
               <SlOptionsVertical />
             </div>
           </div>
+
           <UserList statusFilter={statusFilter} searchQuery={searchQuery} />
+          {edit && (
+            <EditUser
+              user={selectedUser} 
+              onExit={() => setEdit(false)}
+              onUpdate={(updatedUser) => {
+                setEdit(false);
+              }}
+            />
+          )}
         </div>
       </div>
     </div>

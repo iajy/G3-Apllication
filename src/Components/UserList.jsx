@@ -12,13 +12,14 @@ import { FaRegEdit } from "react-icons/fa";
 import EditUser from "./EditUser";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import ConfirmDialog from "./ConfirmDialog";
 
 const columns = [
   { id: "SL", label: "S.L", minWidth: 10 },
-  { id: "first_name", label: "Name", minWidth: 50 },
-  { id: "email", label: "Email", minWidth: 10, align: "right" },
-  { id: "initials", label: "Initials", minWidth: 10, align: "right" },
-  { id: "phone", label: "Phone", minWidth: 100, align: "right" },
+  { id: "first_name", label: "Name", minWidth: 10 },
+  { id: "email", label: "Email", minWidth: 10, align: "left" },
+  { id: "initials", label: "Initials", minWidth: 10, align: "left" },
+  { id: "phone", label: "Phone", minWidth: 10, align: "left" },
   { id: "role", label: "Role", minWidth: 10 },
   { id: "status", label: "Status", minWidth: 10 },
   { id: "title", label: "Title", minWidth: 10 },
@@ -38,7 +39,7 @@ export default function UserList({ statusFilter, searchQuery }) {
         const token = localStorage.getItem("token");
         const companyId = localStorage.getItem("company_id");
 
-        const res = await axios.get("http://13.210.33.250/api/user?status=1", {
+        const res = await axios.get("http://13.210.33.250/api/user", {
           headers: {
             Authorization: `Bearer ${token}`,
             company_id: companyId,
@@ -46,6 +47,7 @@ export default function UserList({ statusFilter, searchQuery }) {
         });
 
         setUsers(res.data.data);
+        console.log(res.data);
       } catch (error) {
         console.error("Error fetching users:", error);
       }
@@ -84,12 +86,12 @@ export default function UserList({ statusFilter, searchQuery }) {
     setSelectedUser(user);
     setEdit(true);
   };
- 
+
   const filteredUsers = users.filter((user) => {
     const matchesStatus =
-    !statusFilter ||
-    (statusFilter === "active" && Number(user.status) === 1) ||
-    (statusFilter === "inactive" && Number(user.status) === 0);
+      !statusFilter ||
+      (statusFilter === "active" && Number(user.status) === 1) ||
+      (statusFilter === "inactive" && Number(user.status) === 0);
 
     const matchesSearch =
       !searchQuery ||
@@ -99,6 +101,38 @@ export default function UserList({ statusFilter, searchQuery }) {
     return matchesStatus && matchesSearch;
   });
 
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
+
+  const handleDeleteClick = (userId) => {
+    setUserToDelete(userId);
+    setConfirmOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const companyId = localStorage.getItem("company_id");
+
+      await axios.delete(`http://13.210.33.250/api/user/${userToDelete}`, {
+        headers: { Authorization: `Bearer ${token}`, company_id: companyId },
+      });
+
+      setUsers((prevUsers) =>
+        prevUsers.filter((user) => user.id !== userToDelete)
+      );
+    } catch (error) {
+      console.error("Error deleting user:", error);
+    } finally {
+      setConfirmOpen(false);
+      setUserToDelete(null);
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setConfirmOpen(false);
+    setUserToDelete(null);
+  };
   return (
     <>
       <Paper sx={{ width: "100%", overflow: "hidden" }}>
@@ -124,10 +158,10 @@ export default function UserList({ statusFilter, searchQuery }) {
                   <TableRow hover key={user.id}>
                     <TableCell>{index + 1}</TableCell>
                     <TableCell>{user.first_name}</TableCell>
-                    <TableCell align="right">{user.email}</TableCell>
-                    <TableCell align="right">{user.initials || "NIL"}</TableCell>
-                    <TableCell align="right">{user.phone || "NIL"}</TableCell>
-                    <TableCell>{user.role?.title || "NIL"}</TableCell>
+                    <TableCell align="left">{user.email}</TableCell>
+                    <TableCell align="left">{user.initials || "NIL"}</TableCell>
+                    <TableCell align="left">{user.phone || "NIL"}</TableCell>
+                    <TableCell>{user.role.title || "NIL"}</TableCell>
                     <TableCell>
                       <button
                         onClick={() => toggleStatus(user.id, user.status)}
@@ -147,6 +181,7 @@ export default function UserList({ statusFilter, searchQuery }) {
                           <MdOutlineDelete
                             className="text-red-600 cursor-pointer"
                             size={19}
+                            onClick={() => handleDeleteClick(user.id)}
                           />
                         </div>
                         <div className="p-2 bg-blue-100 rounded-full">
@@ -186,6 +221,13 @@ export default function UserList({ statusFilter, searchQuery }) {
           }}
         />
       )}
+      <ConfirmDialog
+        open={confirmOpen}
+        title="Confirm Delete"
+        message="Are you sure you want to delete this user?"
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+      />
     </>
   );
 }
