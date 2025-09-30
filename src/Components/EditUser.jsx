@@ -5,12 +5,12 @@ import axios from "axios";
 
 const EditUser = ({ user, onExit, onUpdate }) => {
   const [formData, setFormData] = useState({
-    first_name: "",
+    name: "",
     email: "",
     phone: "",
     title: "",
     initials: "",
-    role_id: "",
+    role: "",
   });
 
   useEffect(() => {
@@ -21,7 +21,7 @@ const EditUser = ({ user, onExit, onUpdate }) => {
         phone: user.phone || "",
         title: user.title || "",
         initials: user.initials || "",
-        role_id: user.role?.id || "",
+        role: user.role || "",
       });
     }
   }, [user]);
@@ -43,15 +43,15 @@ const EditUser = ({ user, onExit, onUpdate }) => {
       const url = user
         ? `http://13.210.33.250/api/user/${user.id}`
         : `http://13.210.33.250/api/user`;
-      const method = user ? "put" : "post";
+      const method = "post";
 
       const payload = {
-        first_name: formData.first_name,
+        name: formData.name,
         email: formData.email,
         phone: formData.phone || null,
         title: formData.title || null,
         initials: formData.initials || null,
-        role_id: Number(formData.role_id),
+        role: formData.role,
       };
 
       const res = await axios({
@@ -106,10 +106,9 @@ const EditUser = ({ user, onExit, onUpdate }) => {
               </label>
               <input
                 type="text"
-                name="first_name"
-                value={formData.first_name}
+                name="name"
+                value={formData.name}
                 onChange={handleChange}
-                required
                 className="border rounded p-2 w-full focus:outline-blue-500"
               />
             </div>
@@ -123,7 +122,6 @@ const EditUser = ({ user, onExit, onUpdate }) => {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                required
                 className="border rounded p-2 w-full focus:outline-blue-500"
               />
             </div>
@@ -166,16 +164,15 @@ const EditUser = ({ user, onExit, onUpdate }) => {
                 Role <span className="text-red-600">*</span>
               </label>
               <select
-                name="role_id"
-                value={formData.role_id}
+                name="role"
+                value={formData.role}
                 onChange={handleChange}
-                required
                 className="border rounded p-2 w-full focus:outline-blue-500"
               >
                 <option value="">Select Role</option>
-                <option value="1">Admin</option>
-                <option value="2">Manager</option>
-                <option value="3">User</option>
+                <option value="Admin">Admin</option>
+                <option value="Manager">Manager</option>
+                <option value="User">User</option>
               </select>
             </div>
           </div>
