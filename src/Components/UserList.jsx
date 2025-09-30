@@ -10,166 +10,49 @@ import TableRow from "@mui/material/TableRow";
 import { MdOutlineDelete } from "react-icons/md";
 import { FaRegEdit } from "react-icons/fa";
 import EditUser from "./EditUser";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 
 const columns = [
   { id: "SL", label: "S.L", minWidth: 10 },
   { id: "name", label: "Name", minWidth: 50 },
-  {
-    id: "email",
-    label: "Email",
-    minWidth: 10,
-    align: "right",
-  },
-  {
-    id: "initials",
-    label: "Intials",
-    minWidth: 10,
-    align: "right",
-  },
-  {
-    id: "phone",
-    label: "Phone",
-    minWidth: 100,
-    align: "right",
-  },
+  { id: "email", label: "Email", minWidth: 10, align: "right" },
+  { id: "initials", label: "Initials", minWidth: 10, align: "right" },
+  { id: "phone", label: "Phone", minWidth: 100, align: "right" },
   { id: "role", label: "Role", minWidth: 10 },
   { id: "status", label: "Status", minWidth: 10 },
   { id: "title", label: "Title", minWidth: 10 },
   { id: "action", label: "Action", minWidth: 10 },
 ];
 
-function createData(
-  SL,
-  name,
-  email,
-  initials,
-  phone,
-  role,
-  status,
-  title,
-  action
-) {
-  
-  return { SL, name, email, initials, phone, role, status, title, action };
-}
-
-const rows = [
-  createData(
-    1,
-    "AjayBinu",
-    "ajaybinuajay2002@gmail.com",
-    "Binu",
-    123456667,
-    "User",
-    "Active",
-    "23-03-25"
-  ),
-  createData(
-    2,
-    "AjayBinu",
-    "ajaybinuajay2002@gmail.com",
-    "Binu",
-    123456667,
-    "User",
-    "Active",
-    "23-03-25"
-  ),
-  createData(
-    3,
-    "AjayBinu",
-    "ajaybinuajay2002@gmail.com",
-    "Binu",
-    123456667,
-    "User",
-    "Active",
-    "23-03-25"
-  ),
-  createData(
-    4,
-    "AjayBinu",
-    "ajaybinuajay2002@gmail.com",
-    "Binu",
-    123456667,
-    "User",
-    "Active",
-    "23-03-25"
-  ),
-  createData(
-    5,
-    "AjayBinu",
-    "ajaybinuajay2002@gmail.com",
-    "Binu",
-    123456667,
-    "User",
-    "Active",
-    "23-03-25"
-  ),
-  createData(
-    6,
-    "AjayBinu",
-    "ajaybinuajay2002@gmail.com",
-    "Binu",
-    123456667,
-    "User",
-    "Active",
-    "23-03-25"
-  ),
-  createData(
-    7,
-    "AjayBinu",
-    "ajaybinuajay2002@gmail.com",
-    "Binu",
-    123456667,
-    "User",
-    "Inactive",
-    "23-03-25"
-  ),
-  createData(
-    8,
-    "AjayBinu",
-    "ajaybinuajay2002@gmail.com",
-    "Binu",
-    123456667,
-    "User",
-    "Active",
-    "23-03-25"
-  ),
-  createData(
-    9,
-    "AjayBinu",
-    "ajaybinuajay2002@gmail.com",
-    "Binu",
-    123456667,
-    "User",
-    "Inactive",
-    "23-03-25"
-  ),
-  createData(
-    10,
-    "AjayBinu",
-    "ajaybinuajay2002@gmail.com",
-    "Binu",
-    123456667,
-    "User",
-    "Active",
-    "23-03-25"
-  ),
-  createData(
-    11,
-    "AjayBinu",
-    "ajaybinuajay2002@gmail.com",
-    "Binu",
-    123456667,
-    "User",
-    "Inactive",
-    "23-03-25"
-  ),
-];
-
 export default function UserList() {
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [users, setUsers] = useState([]);
+  const [edit, setEdit] = useState(false);
+
+  // Fetch users from backend
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const companyId = localStorage.getItem("company_id");
+
+        const res = await axios.get("http://13.210.33.250/api/user?status=1", {
+          headers: {
+            Authorization: `Bearer ${token}`, // token
+            company_id: companyId, // company id
+          },
+        });
+
+        console.log("Fetched users:", res.data);
+        setUsers(res.data.data);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
+    };
+    fetchUsers();
+  }, []);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -180,10 +63,35 @@ export default function UserList() {
     setPage(0);
   };
 
-  const [edit, setEdit] = useState(false);
-
   const editUser = () => {
     setEdit(!edit);
+  };
+
+  const toggleStatus = async (userId, currentStatus) => {
+    try {
+      const token = localStorage.getItem("token");
+      const companyId = localStorage.getItem("company_id");
+
+      // Update status
+      const res = await axios.post(
+        `http://13.210.33.250/api/user/${userId}/status`,
+        { status: currentStatus ? 0 : 1 },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            company_id: companyId,
+          },
+        }
+      );
+
+      setUsers((prevUsers) =>
+        prevUsers.map((user) =>
+          user.id === userId ? { ...user, status: currentStatus ? 0 : 1 } : user
+        )
+      );
+    } catch (error) {
+      console.error("Error updating status:", error);
+    }
   };
 
   return (
@@ -205,54 +113,55 @@ export default function UserList() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {rows
+              {users
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((row) => {
-                  return (
-                    <TableRow
-                      hover
-                      role="checkbox"
-                      tabIndex={-1}
-                      key={row.code}
-                    >
-                      {columns.map((column) => {
-                        const value = row[column.id];
-                        return (
-                          <TableCell key={column.id} align={column.align}>
-                            {column.format && typeof value === "number"
-                              ? column.format(value)
-                              : value}
-                            {column.id == "action" && (
-                              <div className="flex gap-2">
-                                <div className="p-2 bg-red-100 rounded-full ">
-                                  <MdOutlineDelete
-                                    className=" text-red-600 cursor-pointer "
-                                    size={19}
-                                    //   onClick={deleteUser}
-                                  />
-                                </div>
-                                <div className="p-2 bg-blue-100 rounded-full  ">
-                                  <FaRegEdit
-                                    className="text-blue-600 cursor-pointer "
-                                    size={19}
-                                    onClick={editUser}
-                                  />
-                                </div>
-                              </div>
-                            )}
-                          </TableCell>
-                        );
-                      })}
-                    </TableRow>
-                  );
-                })}
+                .map((user, index) => (
+                  <TableRow hover role="checkbox" tabIndex={-1} key={user.id}>
+                    <TableCell>{index + 1}</TableCell>
+                    <TableCell>{user.name}</TableCell>
+                    <TableCell align="right">{user.email}</TableCell>
+                    <TableCell align="right">{user.initials}</TableCell>
+                    <TableCell align="right">{user.phone}</TableCell>
+                    <TableCell>{user.role?.title}</TableCell>
+                    <TableCell>
+                      <button
+                        onClick={() => toggleStatus(user.id, user.status)}
+                        className={`px-3 py-2 rounded-full ${
+                          user.status
+                            ? "bg-gray-300 text-green-500"
+                            : "bg-gray-300 text-red-500"
+                        }`}
+                      >
+                        {user.status ? "Active" : "Inactive"}
+                      </button>
+                    </TableCell>
+                    <TableCell>{user.title}</TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <div className="p-2 bg-red-100 rounded-full">
+                          <MdOutlineDelete
+                            className="text-red-600 cursor-pointer"
+                            size={19}
+                          />
+                        </div>
+                        <div className="p-2 bg-blue-100 rounded-full">
+                          <FaRegEdit
+                            className="text-blue-600 cursor-pointer"
+                            size={19}
+                            onClick={editUser}
+                          />
+                        </div>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
             </TableBody>
           </Table>
         </TableContainer>
         <TablePagination
           rowsPerPageOptions={[10, 25, 100]}
           component="div"
-          count={rows.length}
+          count={users.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
